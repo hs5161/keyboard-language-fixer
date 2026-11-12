@@ -13,13 +13,10 @@
     <div id="results"></div>
 
     <script type="module">
-      import { test, assertEqual, renderResults } from "./test-runner.js";
+      import { renderResults } from "./test-runner.js";
 
-      // Sample test: proves the test infrastructure itself works.
-      // Real test files are imported here as each core module is added.
-      test("test runner compares values", () => {
-        assertEqual([1, "שלום"], [1, "שלום"]);
-      });
+      // Each test file registers and runs its tests when imported.
+      import "./converter.test.js";
 
       renderResults(document.getElementById("results"));
     </script>
