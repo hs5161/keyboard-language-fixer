@@ -8,16 +8,30 @@
     <link rel="stylesheet" href="./src/ui/styles.css" />
   </head>
   <body>
+    <!--
+      The Hebrew texts below are the defaults shown before the script runs.
+      Elements marked with data-i18n are re-filled from src/ui/i18n.js.
+    -->
     <main class="app">
       <header class="app-header">
-        <h1>מתקן שפת מקלדת</h1>
-        <p class="tagline">
-          הקלדתם בשפה הלא נכונה? הדביקו את הטקסט וקבלו אותו מתוקן.
-        </p>
+        <div>
+          <h1 data-i18n="title">מתקן שפת מקלדת</h1>
+          <p class="tagline" data-i18n="tagline">
+            הקלדתם בשפה הלא נכונה? הדביקו את הטקסט וקבלו אותו מתוקן.
+          </p>
+        </div>
+        <button
+          id="language-button"
+          type="button"
+          class="button button-secondary button-small"
+          data-i18n="switchLanguage"
+        >
+          English
+        </button>
       </header>
 
       <section class="panel">
-        <label class="panel-label" for="input-text">הטקסט שלך</label>
+        <label class="panel-label" for="input-text" data-i18n="inputLabel">הטקסט שלך</label>
         <textarea
           id="input-text"
           dir="auto"
@@ -25,9 +39,15 @@
           spellcheck="false"
           autofocus
           placeholder="הדביקו או הקלידו כאן, למשל: akuo"
+          data-i18n-placeholder="inputPlaceholder"
         ></textarea>
-        <div class="panel-actions">
-          <button id="clear-button" type="button" class="button button-secondary">
+        <div class="panel-actions panel-actions-end">
+          <button
+            id="clear-button"
+            type="button"
+            class="button button-secondary"
+            data-i18n="clear"
+          >
             נקה
           </button>
         </div>
@@ -36,16 +56,54 @@
       <p id="status" class="status" role="status" aria-live="polite"></p>
 
       <section class="panel">
-        <label class="panel-label" for="output-text">הטקסט המתוקן</label>
+        <label class="panel-label" for="output-text" data-i18n="outputLabel">
+          הטקסט המתוקן
+        </label>
         <textarea id="output-text" dir="auto" rows="6" readonly></textarea>
         <div class="panel-actions">
-          <button id="copy-button" type="button" class="button button-primary" disabled>
+          <div class="manual-actions">
+            <span class="manual-hint" data-i18n="manualHint">הזיהוי טעה?</span>
+            <button
+              id="to-hebrew-button"
+              type="button"
+              class="button button-secondary button-small"
+              data-i18n="toHebrew"
+              disabled
+            >
+              המר לעברית
+            </button>
+            <button
+              id="to-english-button"
+              type="button"
+              class="button button-secondary button-small"
+              data-i18n="toEnglish"
+              disabled
+            >
+              המר לאנגלית
+            </button>
+            <button
+              id="original-button"
+              type="button"
+              class="button button-secondary button-small"
+              data-i18n="showOriginal"
+              disabled
+            >
+              החזר מקור
+            </button>
+          </div>
+          <button
+            id="copy-button"
+            type="button"
+            class="button button-primary"
+            data-i18n="copy"
+            disabled
+          >
             העתק
           </button>
         </div>
       </section>
 
-      <footer class="app-footer">
+      <footer class="app-footer" data-i18n="footer">
         הטקסט מעובד בדפדפן שלך בלבד ואינו נשלח לשום מקום.
       </footer>
     </main>

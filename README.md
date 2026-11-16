@@ -9,7 +9,8 @@ The tool detects the correction direction automatically and runs entirely in the
 
 - Hebrew ↔ English keyboard layout correction with automatic direction detection
 - Correct text is left untouched
-- Simple interface in Hebrew and English (English interface coming)
+- Manual conversion buttons for the cases detection gets wrong
+- Simple interface in Hebrew and English
 
 ## Running locally
 

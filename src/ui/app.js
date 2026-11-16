@@ -1,26 +1,105 @@
 /**
  * User interface logic.
  *
- * Connects the page elements to the core fix() function. This file knows
- * about the page; the core knows nothing about it.
+ * Connects the page elements to the core functions. This file knows about
+ * the page; the core knows nothing about it.
  */
 
 import { fix, FixAction } from "../core/fixer.js";
+import { convert, Direction } from "../core/converter.js";
+import { DEFAULT_LANGUAGE, LANGUAGES, isSupportedLanguage, translate } from "./i18n.js";
 
 /** How long the "copied" confirmation stays on the copy button. */
 const COPIED_FEEDBACK_MS = 2000;
 
-/** Status line text for each outcome of fix(). */
-const STATUS_MESSAGES = Object.freeze({
-  [FixAction.NONE]: "הטקסט נראה תקין, לא בוצע שינוי.",
-  [FixAction.EN_TO_HE]: "זוהה טקסט שהוקלד באנגלית במקום בעברית, והוא תוקן.",
-  [FixAction.HE_TO_EN]: "זוהה טקסט שהוקלד בעברית במקום באנגלית, והוא תוקן.",
-  [FixAction.MIXED]: "זוהו ותוקנו שורות בשני הכיוונים.",
+/** Browser storage key for the chosen interface language. */
+const LANGUAGE_STORAGE_KEY = "keyboard-language-fixer.language";
+
+/**
+ * How the output is produced from the input.
+ * @enum {string}
+ */
+const Mode = Object.freeze({
+  /** Automatic detection with fix(). */
+  AUTO: "auto",
+  /** The user forced a conversion to Hebrew. */
+  TO_HEBREW: "to-hebrew",
+  /** The user forced a conversion to English. */
+  TO_ENGLISH: "to-english",
+  /** The user asked to see the input unchanged. */
+  ORIGINAL: "original",
 });
 
-const COPY_LABEL = "העתק";
-const COPIED_LABEL = "הועתק ✓";
-const COPY_FAILED_MESSAGE = "ההעתקה נכשלה. אפשר לסמן את הטקסט ולהעתיק ידנית.";
+/** Status text key for each outcome of fix(). */
+const AUTO_STATUS_KEYS = Object.freeze({
+  [FixAction.NONE]: "statusNone",
+  [FixAction.EN_TO_HE]: "statusEnToHe",
+  [FixAction.HE_TO_EN]: "statusHeToEn",
+  [FixAction.MIXED]: "statusMixed",
+});
+
+/**
+ * @typedef {Object} Output
+ * @property {string} text - Text for the output box.
+ * @property {string} statusKey - i18n key of the status message.
+ * @property {"fixed" | "unchanged"} state - Visual style of the status line.
+ */
+
+/**
+ * Produces the output for the given input and mode. Pure: no page access.
+ * @param {string} text
+ * @param {Mode} mode
+ * @returns {Output}
+ */
+function computeOutput(text, mode) {
+  switch (mode) {
+    case Mode.TO_HEBREW:
+      return {
+        text: convert(text, Direction.EN_TO_HE),
+        statusKey: "statusManualToHebrew",
+        state: "fixed",
+      };
+    case Mode.TO_ENGLISH:
+      return {
+        text: convert(text, Direction.HE_TO_EN),
+        statusKey: "statusManualToEnglish",
+        state: "fixed",
+      };
+    case Mode.ORIGINAL:
+      return { text, statusKey: "statusOriginal", state: "unchanged" };
+    default: {
+      const result = fix(text);
+      return {
+        text: result.text,
+        statusKey: AUTO_STATUS_KEYS[result.action],
+        state: result.changed ? "fixed" : "unchanged",
+      };
+    }
+  }
+}
+
+/**
+ * Reads the saved interface language. Storage can be unavailable (for example
+ * in private browsing), in which case the default language is used.
+ * @returns {string}
+ */
+function loadLanguage() {
+  try {
+    const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    return isSupportedLanguage(saved) ? saved : DEFAULT_LANGUAGE;
+  } catch {
+    return DEFAULT_LANGUAGE;
+  }
+}
+
+/** @param {string} language */
+function saveLanguage(language) {
+  try {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  } catch {
+    // Not being able to remember the choice is harmless.
+  }
+}
 
 /**
  * Starts the application on the current page.
@@ -32,63 +111,125 @@ export function initApp() {
   const status = requireElement("status");
   const copyButton = /** @type {HTMLButtonElement} */ (requireElement("copy-button"));
   const clearButton = /** @type {HTMLButtonElement} */ (requireElement("clear-button"));
+  const languageButton = /** @type {HTMLButtonElement} */ (requireElement("language-button"));
+  const manualButtons = /** @type {Array<[HTMLButtonElement, Mode]>} */ ([
+    [requireElement("to-hebrew-button"), Mode.TO_HEBREW],
+    [requireElement("to-english-button"), Mode.TO_ENGLISH],
+    [requireElement("original-button"), Mode.ORIGINAL],
+  ]);
 
+  let language = loadLanguage();
+  /** @type {Mode} */
+  let mode = Mode.AUTO;
+  /** @type {{ key: string, state: string } | null} */
+  let currentStatus = null;
   /** @type {number | undefined} */
   let copiedTimer;
 
-  function resetCopyButton() {
-    window.clearTimeout(copiedTimer);
-    copyButton.textContent = COPY_LABEL;
+  function renderStatus() {
+    status.textContent = currentStatus ? translate(language, currentStatus.key) : "";
+    status.dataset.state = currentStatus ? currentStatus.state : "";
   }
 
   /**
-   * @param {string} message
-   * @param {"fixed" | "unchanged" | "error" | ""} state
+   * @param {string} key - i18n key of the message.
+   * @param {"fixed" | "unchanged" | "error"} state
    */
-  function showStatus(message, state) {
-    status.textContent = message;
-    status.dataset.state = state;
+  function showStatus(key, state) {
+    currentStatus = { key, state };
+    renderStatus();
+  }
+
+  function clearStatus() {
+    currentStatus = null;
+    renderStatus();
+  }
+
+  function resetCopyButton() {
+    window.clearTimeout(copiedTimer);
+    copyButton.textContent = translate(language, "copy");
+  }
+
+  /** Fills every translatable element and sets the page direction. */
+  function applyLanguage() {
+    document.documentElement.lang = language;
+    document.documentElement.dir = LANGUAGES[language].direction;
+    document.title = translate(language, "title");
+
+    for (const element of document.querySelectorAll("[data-i18n]")) {
+      element.textContent = translate(language, element.getAttribute("data-i18n") ?? "");
+    }
+    for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
+      element.setAttribute(
+        "placeholder",
+        translate(language, element.getAttribute("data-i18n-placeholder") ?? ""),
+      );
+    }
+    renderStatus();
   }
 
   function update() {
     resetCopyButton();
     const text = input.value;
+    const isEmpty = text.trim() === "";
 
-    if (text.trim() === "") {
+    copyButton.disabled = isEmpty;
+    for (const [button] of manualButtons) {
+      button.disabled = isEmpty;
+    }
+
+    if (isEmpty) {
       output.value = "";
-      copyButton.disabled = true;
-      showStatus("", "");
+      clearStatus();
       return;
     }
 
-    const result = fix(text);
+    const result = computeOutput(text, mode);
     output.value = result.text;
-    copyButton.disabled = false;
-    showStatus(STATUS_MESSAGES[result.action], result.changed ? "fixed" : "unchanged");
+    showStatus(result.statusKey, result.state);
   }
 
   async function copyOutput() {
     try {
       await navigator.clipboard.writeText(output.value);
-      copyButton.textContent = COPIED_LABEL;
+      copyButton.textContent = translate(language, "copied");
       copiedTimer = window.setTimeout(resetCopyButton, COPIED_FEEDBACK_MS);
     } catch {
       // Clipboard access can be blocked by the browser; let the user copy by hand.
       output.select();
-      showStatus(COPY_FAILED_MESSAGE, "error");
+      showStatus("copyFailed", "error");
     }
   }
 
-  function clearAll() {
-    input.value = "";
+  // New input always goes back to automatic detection.
+  input.addEventListener("input", () => {
+    mode = Mode.AUTO;
     update();
-    input.focus();
+  });
+
+  for (const [button, buttonMode] of manualButtons) {
+    button.addEventListener("click", () => {
+      mode = buttonMode;
+      update();
+    });
   }
 
-  input.addEventListener("input", update);
   copyButton.addEventListener("click", copyOutput);
-  clearButton.addEventListener("click", clearAll);
 
+  clearButton.addEventListener("click", () => {
+    input.value = "";
+    mode = Mode.AUTO;
+    update();
+    input.focus();
+  });
+
+  languageButton.addEventListener("click", () => {
+    language = language === "he" ? "en" : "he";
+    saveLanguage(language);
+    applyLanguage();
+  });
+
+  applyLanguage();
   // The browser may restore text into the field after a page reload.
   update();
 }
