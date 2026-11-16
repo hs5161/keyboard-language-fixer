@@ -1,0 +1,186 @@
+/* Design tokens: light theme by default, dark theme follows the system. */
+:root {
+  --color-background: #f4f6f8;
+  --color-surface: #ffffff;
+  --color-text: #1c2430;
+  --color-text-muted: #5b6675;
+  --color-border: #d5dbe3;
+  --color-accent: #0f6e84;
+  --color-accent-hover: #0b5769;
+  --color-on-accent: #ffffff;
+  --color-success-background: #e3f4ea;
+  --color-success-text: #17603a;
+  --color-neutral-background: #e9edf2;
+  --color-neutral-text: #44505f;
+  --color-error-background: #fbe6e4;
+  --color-error-text: #9b2c22;
+
+  --radius: 12px;
+  --space: 16px;
+  --font-family: "Segoe UI", "Arial Hebrew", Arial, system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #12171d;
+    --color-surface: #1c232c;
+    --color-text: #e8edf3;
+    --color-text-muted: #9aa6b5;
+    --color-border: #313b48;
+    --color-accent: #3fb2cc;
+    --color-accent-hover: #63c4da;
+    --color-on-accent: #0c1318;
+    --color-success-background: #173526;
+    --color-success-text: #8fd9ad;
+    --color-neutral-background: #252e39;
+    --color-neutral-text: #b4bfcc;
+    --color-error-background: #3d1d1a;
+    --color-error-text: #f2a79f;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: calc(var(--space) * 2) var(--space);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+.tagline {
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+}
+
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel-label {
+  font-weight: 600;
+}
+
+textarea {
+  width: 100%;
+  min-height: 130px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+textarea:focus-visible,
+.button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+textarea[readonly] {
+  background: var(--color-surface);
+}
+
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.button {
+  min-width: 96px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button-primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.button-primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.button-secondary {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: var(--color-neutral-background);
+}
+
+/* The status line keeps its height when empty so the layout does not jump. */
+.status {
+  margin: 0;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.status[data-state="fixed"] {
+  background: var(--color-success-background);
+  color: var(--color-success-text);
+}
+
+.status[data-state="unchanged"] {
+  background: var(--color-neutral-background);
+  color: var(--color-neutral-text);
+}
+
+.status[data-state="error"] {
+  background: var(--color-error-background);
+  color: var(--color-error-text);
+}
+
+.app-footer {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}

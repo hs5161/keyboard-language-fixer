@@ -1,8 +1,10 @@
 /**
  * Application entry point.
  *
- * Wires the user interface (src/ui) to the core logic (src/core).
- * Both layers are added in later development stages.
+ * Starts the user interface (src/ui), which in turn uses the core logic
+ * (src/core).
  */
 
-document.documentElement.dataset.appLoaded = "true";
+import { initApp } from "./ui/app.js";
+
+initApp();

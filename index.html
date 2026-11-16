@@ -3,13 +3,53 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>Keyboard Language Fixer</title>
+    <link rel="stylesheet" href="./src/ui/styles.css" />
   </head>
   <body>
-    <main id="app">
-      <h1>Keyboard Language Fixer</h1>
-      <p>מתקן שפת מקלדת – הפרויקט בהקמה.</p>
+    <main class="app">
+      <header class="app-header">
+        <h1>מתקן שפת מקלדת</h1>
+        <p class="tagline">
+          הקלדתם בשפה הלא נכונה? הדביקו את הטקסט וקבלו אותו מתוקן.
+        </p>
+      </header>
+
+      <section class="panel">
+        <label class="panel-label" for="input-text">הטקסט שלך</label>
+        <textarea
+          id="input-text"
+          dir="auto"
+          rows="6"
+          spellcheck="false"
+          autofocus
+          placeholder="הדביקו או הקלידו כאן, למשל: akuo"
+        ></textarea>
+        <div class="panel-actions">
+          <button id="clear-button" type="button" class="button button-secondary">
+            נקה
+          </button>
+        </div>
+      </section>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+
+      <section class="panel">
+        <label class="panel-label" for="output-text">הטקסט המתוקן</label>
+        <textarea id="output-text" dir="auto" rows="6" readonly></textarea>
+        <div class="panel-actions">
+          <button id="copy-button" type="button" class="button button-primary" disabled>
+            העתק
+          </button>
+        </div>
+      </section>
+
+      <footer class="app-footer">
+        הטקסט מעובד בדפדפן שלך בלבד ואינו נשלח לשום מקום.
+      </footer>
     </main>
+
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>

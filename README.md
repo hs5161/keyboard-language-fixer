@@ -5,11 +5,11 @@ The tool detects the correction direction automatically and runs entirely in the
 
 **Status:** in early development.
 
-## Planned features
+## Features
 
 - Hebrew ↔ English keyboard layout correction with automatic direction detection
-- Fixing reversed Hebrew text copied from PDF files
-- Simple interface in Hebrew and English
+- Correct text is left untouched
+- Simple interface in Hebrew and English (English interface coming)
 
 ## Running locally
 
@@ -26,8 +26,8 @@ Then open <http://localhost:5173> for the app, or <http://localhost:5173/tests/t
 ```
 index.html     page shell
 src/main.js    entry point
-src/core/      text-fixing logic, independent of the interface (coming)
-src/ui/        user interface (coming)
+src/core/      text-fixing logic, independent of the interface
+src/ui/        user interface
 tests/         browser-based tests
 ```
 
