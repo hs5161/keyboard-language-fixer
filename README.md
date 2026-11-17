@@ -3,7 +3,7 @@
 Fixes text that was typed with the wrong keyboard layout, for example `akuo` → `שלום`.
 The tool detects the correction direction automatically and runs entirely in the browser: no server, and your text never leaves your computer.
 
-**Status:** in early development.
+**Try it:** <https://hs5161.github.io/keyboard-language-fixer/>
 
 ## Features
 
@@ -26,11 +26,16 @@ Then open <http://localhost:5173> for the app, or <http://localhost:5173/tests/t
 
 ```
 index.html     page shell
+favicon.svg    page icon
 src/main.js    entry point
 src/core/      text-fixing logic, independent of the interface
 src/ui/        user interface
 tests/         browser-based tests
 ```
+
+## License
+
+Released under the [MIT License](LICENSE).
 
 ---
 
@@ -41,6 +46,13 @@ tests/         browser-based tests
 כלי לתיקון טקסט שהוקלד בשפת מקלדת שגויה, למשל `akuo` ← `שלום`.
 הכלי מזהה את כיוון התיקון באופן אוטומטי ורץ כולו בדפדפן: אין שרת, והטקסט לא יוצא מהמחשב שלך.
 
-**מצב:** בתחילת הפיתוח.
+**לנסות:** <https://hs5161.github.io/keyboard-language-fixer/>
+
+## יכולות
+
+- תיקון טקסט בין עברית לאנגלית, עם זיהוי אוטומטי של כיוון התיקון
+- טקסט תקין נשאר כמו שהוא
+- כפתורי המרה ידניים למקרים שבהם הזיהוי טועה
+- ממשק פשוט בעברית ובאנגלית
 
 </div>
