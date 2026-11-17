@@ -110,6 +110,7 @@ export function initApp() {
   const output = /** @type {HTMLTextAreaElement} */ (requireElement("output-text"));
   const status = requireElement("status");
   const copyButton = /** @type {HTMLButtonElement} */ (requireElement("copy-button"));
+  const copyAnnouncement = requireElement("copy-announcement");
   const clearButton = /** @type {HTMLButtonElement} */ (requireElement("clear-button"));
   const languageButton = /** @type {HTMLButtonElement} */ (requireElement("language-button"));
   const manualButtons = /** @type {Array<[HTMLButtonElement, Mode]>} */ ([
@@ -127,7 +128,12 @@ export function initApp() {
   let copiedTimer;
 
   function renderStatus() {
-    status.textContent = currentStatus ? translate(language, currentStatus.key) : "";
+    const text = currentStatus ? translate(language, currentStatus.key) : "";
+    // Rewriting the same text would make screen readers announce it again
+    // on every keystroke.
+    if (status.textContent !== text) {
+      status.textContent = text;
+    }
     status.dataset.state = currentStatus ? currentStatus.state : "";
   }
 
@@ -148,6 +154,7 @@ export function initApp() {
   function resetCopyButton() {
     window.clearTimeout(copiedTimer);
     copyButton.textContent = translate(language, "copy");
+    copyAnnouncement.textContent = "";
   }
 
   /** Fills every translatable element and sets the page direction. */
@@ -155,6 +162,8 @@ export function initApp() {
     document.documentElement.lang = language;
     document.documentElement.dir = LANGUAGES[language].direction;
     document.title = translate(language, "title");
+    // The button shows the name of the other language, in that language.
+    languageButton.lang = language === "he" ? "en" : "he";
 
     for (const element of document.querySelectorAll("[data-i18n]")) {
       element.textContent = translate(language, element.getAttribute("data-i18n") ?? "");
@@ -163,6 +172,12 @@ export function initApp() {
       element.setAttribute(
         "placeholder",
         translate(language, element.getAttribute("data-i18n-placeholder") ?? ""),
+      );
+    }
+    for (const element of document.querySelectorAll("[data-i18n-content]")) {
+      element.setAttribute(
+        "content",
+        translate(language, element.getAttribute("data-i18n-content") ?? ""),
       );
     }
     renderStatus();
@@ -174,8 +189,9 @@ export function initApp() {
     const isEmpty = text.trim() === "";
 
     copyButton.disabled = isEmpty;
-    for (const [button] of manualButtons) {
+    for (const [button, buttonMode] of manualButtons) {
       button.disabled = isEmpty;
+      button.setAttribute("aria-pressed", String(!isEmpty && mode === buttonMode));
     }
 
     if (isEmpty) {
@@ -193,6 +209,7 @@ export function initApp() {
     try {
       await navigator.clipboard.writeText(output.value);
       copyButton.textContent = translate(language, "copied");
+      copyAnnouncement.textContent = translate(language, "copied");
       copiedTimer = window.setTimeout(resetCopyButton, COPIED_FEEDBACK_MS);
     } catch {
       // Clipboard access can be blocked by the browser; let the user copy by hand.

@@ -4,7 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="הקלדתם בשפה הלא נכונה? הדביקו את הטקסט וקבלו אותו מתוקן."
+      data-i18n-content="tagline"
+    />
     <title>Keyboard Language Fixer</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./src/ui/styles.css" />
   </head>
   <body>
@@ -25,6 +31,7 @@
           type="button"
           class="button button-secondary button-small"
           data-i18n="switchLanguage"
+          lang="en"
         >
           English
         </button>
@@ -68,6 +75,7 @@
               type="button"
               class="button button-secondary button-small"
               data-i18n="toHebrew"
+              aria-pressed="false"
               disabled
             >
               המר לעברית
@@ -77,6 +85,7 @@
               type="button"
               class="button button-secondary button-small"
               data-i18n="toEnglish"
+              aria-pressed="false"
               disabled
             >
               המר לאנגלית
@@ -86,6 +95,7 @@
               type="button"
               class="button button-secondary button-small"
               data-i18n="showOriginal"
+              aria-pressed="false"
               disabled
             >
               החזר מקור
@@ -100,6 +110,8 @@
           >
             העתק
           </button>
+          <!-- Announces a successful copy to screen readers. -->
+          <span id="copy-announcement" class="visually-hidden" role="status"></span>
         </div>
       </section>
 
