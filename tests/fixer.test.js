@@ -93,6 +93,73 @@ test("fix: several lines fixed the same way report that direction", () => {
   });
 });
 
+// --- Everyday examples ---
+
+test("fix: everyday Hebrew typed on an English layout", () => {
+  const cases = [
+    ["cuer yuc", "בוקר טוב"],
+    ["nv eurv", "מה קורה"],
+    ["nv vagv?", "מה השעה?"],
+    ["tbh mrhl gzrv", "אני צריך עזרה"],
+    ["t,v hfuk kakuj kh t, veuc./", "אתה יכול לשלוח לי את הקובץ."],
+  ];
+  for (const [wrong, expected] of cases) {
+    assertEqual(fix(wrong).text, expected);
+  }
+});
+
+test("fix: everyday English typed on a Hebrew layout", () => {
+  const cases = [
+    ["מם", "no"],
+    ["אישמל טםו", "thank you"],
+    ["עםםג צםרמןמע", "good morning"],
+    ["ישהק ש מןבק גשט", "have a nice day"],
+    ["ןצ םמ צט 'שט", "im on my way"],
+    ["ן 'ןךך דקמג ןא ךשאקר", "i will send it later"],
+    ["פךקשדק בשךך צק אםצםררם'", "please call me tomorrow"],
+  ];
+  for (const [wrong, expected] of cases) {
+    assertEqual(fix(wrong).text, expected);
+  }
+});
+
+test("fix: short everyday words and replies are unchanged", () => {
+  assertUnchanged(["כן", "לא", "yes", "no", "OK", "Hi!", "תודה!", "a", "I", "lol", "asap"]);
+});
+
+test("fix: names, brands and capitalised words are unchanged", () => {
+  assertUnchanged(["Dana", "דנה", "Tel Aviv", "ירושלים", "Python", "Excel", "iPhone", "USB", "ABC"]);
+});
+
+test("fix: addresses, paths and file names are unchanged", () => {
+  assertUnchanged([
+    "dana@example.com",
+    "https://www.example.com/page",
+    "file.txt",
+    "C:\\Users\\docs",
+    "html css",
+  ]);
+});
+
+test("fix: text with numbers and symbols is unchanged", () => {
+  assertUnchanged(["wifi password: 12345", "פגישה ב-10:30", "Windows 11", "5 kg", "20%"]);
+});
+
+test("fix: Hebrew with apostrophes and abbreviation marks is unchanged", () => {
+  assertUnchanged(["ג'ירפה", "צ'יפס", 'ד"ר כהן', '10 ש"ח']);
+});
+
+test("fix: ordinary sentences are unchanged", () => {
+  assertUnchanged([
+    "מה קורה?",
+    "בוקר טוב",
+    "I love you",
+    "see you tomorrow",
+    "it's ok",
+    "e.g. this",
+  ]);
+});
+
 // --- Invalid input ---
 
 test("fix: non-string input throws TypeError", () => {

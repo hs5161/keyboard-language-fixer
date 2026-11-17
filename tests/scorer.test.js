@@ -31,7 +31,7 @@ test("scorer: a known English word scores 1 in any letter case", () => {
 test("scorer: Hebrew prefixes and English suffixes are recognised", () => {
   assertEqual(analyze("והבית").score, 0.9);
   assertEqual(analyze("books").score, 0.9);
-  assertEqual(analyze("don't").score, 0.9);
+  assertEqual(analyze("dog's").score, 0.9);
 });
 
 // --- Clear gibberish ---
@@ -55,7 +55,7 @@ test("scorer: an English word without vowels scores low", () => {
 // --- Unknown but possible words ---
 
 test("scorer: an unknown but well-formed Hebrew word gets a middle score", () => {
-  assertEqual(analyze("מקרר"), { score: 0.5, knownRatio: 0, letterCount: 4 });
+  assertEqual(analyze("גמלים"), { score: 0.5, knownRatio: 0, letterCount: 5 });
 });
 
 // --- Punctuation ---
